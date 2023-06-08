@@ -1,9 +1,7 @@
-import { RandomFormatArgs } from "../rccTypes.js";
+import { OptionChannelType, RandomFormatArgs } from "../rccTypes.js";
 import { checkAlpha } from "../tools/checkAlpha.js";
-import {
-  generateRandomNumber,
-  generateRandomFloatNumber,
-} from "../tools/generateRandomNumber.js";
+import { generateRandomFloatNumber } from "../tools/generateRandomFloatNumber.js";
+import { generateRandomNumber } from "../tools/generateRandomNumber.js";
 import keysObject from "../tools/keysObject.js";
 
 export default function hsl({
@@ -50,55 +48,43 @@ export default function hsl({
     } else {
       switch (i) {
         case 0:
-          if (options?.hue) {
-            const { hue } = options;
-            frame[i] = generateRandomNumber(
-              hue?.minValue ? hue?.minValue : 0,
-              hue?.maxValue ? hue.maxValue : 360
-            );
-          } else {
-            // frame[i] = generateRandomNumber(
-            //   options?.minValue ? options.minValue : 0,
-            //   options?.maxValue ? options.maxValue : 360
-            // );
-          }
+          passColorOptionData(options?.hue, 0, 360);
           break;
 
         case 1:
-          if (options?.saturation) {
-            const { saturation } = options;
-            frame[i] = generateRandomNumber(
-              saturation?.minValue ? saturation.minValue : 0,
-              saturation?.maxValue ? saturation.maxValue : 100
-            );
-          } else {
-            // frame[i] = generateRandomNumber(
-            //   options?.minValue ? options.minValue : 0,
-            //   options?.maxValue ? options.maxValue : 100
-            // );
-          }
+          passColorOptionData(options?.saturation, 0, 100);
           break;
 
         case 2:
-          if (options?.lightness) {
-            const { lightness } = options;
-            frame[i] = generateRandomNumber(
-              lightness?.minValue ? lightness.minValue : 0,
-              lightness?.maxValue ? lightness.maxValue : 100
-            );
-          } else {
-            // frame[i] = generateRandomNumber(
-            //   options?.minValue ? options.minValue : 0,
-            //   options?.maxValue ? options.maxValue : 100
-            // );
-          }
+          passColorOptionData(options?.lightness, 0, 100);
           break;
+      }
+
+      function passColorOptionData(
+        colorChannel: OptionChannelType,
+        defaultMin: number,
+        defaultMax: number
+      ) {
+        if (colorChannel) {
+          const { minValue, maxValue } = colorChannel;
+          frame[i] = generateRandomNumber(
+            minValue ? minValue : defaultMin,
+            maxValue ? maxValue : defaultMax
+          );
+        } else {
+          frame[i] = generateRandomNumber(defaultMin, defaultMax);
+        }
       }
     }
   }
 
   const [hue, saturation, lightness] = frame;
   let alpha: string | number | undefined;
+  const { random, minValue, maxValue } = options?.opacity ?? {
+    random: false,
+    minValue: undefined,
+    maxValue: undefined,
+  };
 
   if (alphaChannel != null) {
     // checks if alpha is number from range between 0 and 1
@@ -106,32 +92,25 @@ export default function hsl({
 
     if (!checkAlpha(alphaChannel, "number")) return null;
     alpha = alphaChannel.toString();
-  } else if (options?.opacity) {
-    const {
-      opacity: { random, minValue, maxValue },
-    } = options;
-    if (random) {
-      alpha = generateRandomFloatNumber(0, 1);
-    } else {
-      let errorAt = -1;
-      const valuesArray = [minValue, maxValue];
+  } else if (minValue != null || maxValue != null) {
+    let errorAt = -1;
+    const valuesArray = [minValue, maxValue];
 
-      valuesArray.forEach((value, i) => {
-        if (value != null && !checkAlpha(value, "number")) errorAt = i;
-      });
+    valuesArray.forEach((value, i) => {
+      if (value == null) errorAt = i;
+    });
 
-      alpha = generateRandomFloatNumber(
-        errorAt !== 0 ? minValue! : 0,
-        errorAt !== 1 ? maxValue! : 1
-      );
-    }
+    alpha = generateRandomFloatNumber(
+      errorAt !== 0 ? minValue! : 0,
+      errorAt !== 1 ? maxValue! : 1
+    );
+  } else if (random) {
+    alpha = generateRandomFloatNumber(0, 1);
   }
 
-  if (!alpha) {
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  }
-
-  return `hsl(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
+  return alpha
+    ? `hsl(${hue}, ${saturation}%, ${lightness}%, ${alpha})`
+    : `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 
   function checkOptions(): void {
     if (options) {
@@ -152,7 +131,7 @@ export default function hsl({
 
 function isWrongWritten(
   numberToCheck: number,
-  part: "hue" | "saturation" | "lightness" | "opacity"
+  part: "opacity" | "hue" | "saturation" | "lightness"
 ): void {
   const showError = () => {
     throw new Error(`The ${part} is out of accepted range`);
