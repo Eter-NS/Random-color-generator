@@ -78,3 +78,10 @@ export interface Options {
     maxValue?: number;
   };
 }
+
+export type OptionChannelType =
+  | {
+      minValue?: number | undefined;
+      maxValue?: number | undefined;
+    }
+  | undefined;
