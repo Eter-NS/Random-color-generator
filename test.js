@@ -4,9 +4,9 @@ import { RandomColorGenerator } from "./dist/rcc.js";
 
 console.log(
   RandomColorGenerator({
-    format: "HEX",
+    format: "RGB",
     colorParts: ["", "", ""],
-    alphaChannel: "ff",
+    // alphaChannel: "ff",
     optionsObj: {
       hsl: {
         // hue: { minValue: 100, maxValue: 110 },
@@ -20,8 +20,8 @@ console.log(
       },
       hex: {
         // red: {
-        //   minValue: 5,
-        //   maxValue: 9,
+        // minValue: 5,
+        // maxValue: 9,
         // },
         // green: {
         //   minValue: 0,
@@ -48,6 +48,8 @@ console.log(
         //   minValue: 0.5,
         //   maxValue: 0.6,
         // },
+        // minValue: 0,
+        // maxValue: 14,
       },
     },
   })
