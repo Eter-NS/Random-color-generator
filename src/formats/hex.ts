@@ -1,18 +1,13 @@
-import { RandomFormatArgs } from "../rccTypes.js";
+import { RandomFormatArgs, OptionChannelType } from "../rccTypes.js";
 import { checkAlpha } from "../tools/checkAlpha.js";
 import keysObject from "../tools/keysObject.js";
 import selectHexNumber from "../tools/selectHexNumber.js";
 
-export default function hex(
-  // colorParts: ColorParts,
-  // alphaChannel: AlphaType = undefined,
-  // { hex: options }: Options,
-  {
-    colorParts = ["", "", ""],
-    alphaChannel = undefined,
-    optionsObj: { hex: options },
-  }: RandomFormatArgs
-): string | null {
+export default function hex({
+  colorParts = ["", "", ""],
+  alphaChannel = undefined,
+  optionsObj: { hex: options },
+}: RandomFormatArgs): string | null {
   // validation
   if (typeof colorParts !== "object" && "length" in colorParts)
     throw new Error("The colorParts is not an array");
@@ -49,49 +44,29 @@ export default function hex(
     // if user did not defined the color part
     switch (i) {
       case 0:
-        if (options?.red) {
-          const { red } = options;
-          frame[i] = createHexNumber(
-            red.minValue ? red.minValue : 0,
-            red.maxValue ? red.maxValue : 14
-          );
-        } else {
-          frame[i] = createHexNumber(
-            options?.minValue ? options.minValue : 0,
-            options?.maxValue ? options.maxValue : 14
-          );
-        }
-
+        createColorChannel(options?.red);
         break;
       case 1:
-        if (options?.green) {
-          const { green } = options;
-          frame[i] = createHexNumber(
-            green.minValue ? green.minValue : 0,
-            green.maxValue ? green.maxValue : 14
-          );
-        } else {
-          frame[i] = createHexNumber(
-            options?.minValue ? options.minValue : 0,
-            options?.maxValue ? options.maxValue : 14
-          );
-        }
-
+        createColorChannel(options?.green);
         break;
       case 2:
-        if (options?.blue) {
-          const { blue } = options;
-          frame[i] = createHexNumber(
-            blue.minValue ? blue.minValue : 0,
-            blue.maxValue ? blue.maxValue : 14
-          );
-        } else {
-          frame[i] = createHexNumber(
-            options?.minValue ? options.minValue : 0,
-            options?.maxValue ? options.maxValue : 14
-          );
-        }
+        createColorChannel(options?.blue);
         break;
+    }
+
+    function createColorChannel(colorChannel: OptionChannelType) {
+      if (colorChannel) {
+        const { minValue, maxValue } = colorChannel;
+        frame[i] = createHexNumber(
+          minValue ? minValue : 0,
+          maxValue ? maxValue : 14
+        );
+      } else {
+        frame[i] = createHexNumber(
+          options?.minValue ? options.minValue : 0,
+          options?.maxValue ? options.maxValue : 14
+        );
+      }
     }
   }
   function createHexNumber(min: number, max: number) {
@@ -104,28 +79,18 @@ export default function hex(
   let alpha: string | undefined;
 
   if (typeof alphaChannel === "string" && checkAlpha(alphaChannel, "string")) {
-    // const isHexNumber = checkAlpha(alphaValue, "string");
-
-    // in case if user uses shorthand and passes good hex alpha
-    // if (isHexNumber && isShorthand) {
-    //   frame.forEach((element, index) => {
-    //     frame[index] = element + element;
-    //   });
-    // }
-
     alpha = alphaChannel;
   } else if (options?.opacity) {
     const {
       opacity: { random, minValue, maxValue },
     } = options;
-    if (random) {
+    if (minValue != null || maxValue != null) {
+      alpha = createHexNumber(
+        minValue ? minValue : 0,
+        maxValue ? maxValue : 14
+      );
+    } else if (random) {
       alpha = createHexNumber(0, 14);
-    } else if (minValue && maxValue) {
-      alpha = createHexNumber(minValue, maxValue);
-    } else if (minValue) {
-      alpha = createHexNumber(minValue, 14);
-    } else if (maxValue) {
-      alpha = createHexNumber(0, maxValue);
     }
   }
 
@@ -133,6 +98,14 @@ export default function hex(
     return `#${frame.join("")}${alpha}`;
   }
   return `#${frame.join("")}`;
+
+  /*
+
+
+  Checks
+
+
+  */
 
   function checkOptions(): void {
     if (options) {
