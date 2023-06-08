@@ -79,7 +79,7 @@ export default function hex({
   let alpha: string | undefined;
 
   if (typeof alphaChannel === "string" && checkAlpha(alphaChannel, "string")) {
-    alpha = alphaChannel;
+    alpha = alphaChannel.toUpperCase();
   } else if (options?.opacity) {
     const {
       opacity: { random, minValue, maxValue },
