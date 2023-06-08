@@ -53,8 +53,6 @@ export interface Options {
       minValue?: number /* 0 - 1 */;
       maxValue?: number /* 0 - 1 */;
     };
-    // minValue?: number; /* 0 - 100 */
-    // maxValue?: number; /* 0 - 100 */
   };
   rgb?: {
     red?: {
