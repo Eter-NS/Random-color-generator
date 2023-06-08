@@ -1,5 +1,5 @@
 export function checkAlpha(
-  alphaChannel: string | number,
+  alphaChannel: string | number | undefined,
   desiredType: "string" | "number"
 ): boolean {
   switch (desiredType) {
