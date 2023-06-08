@@ -1,7 +1,5 @@
 export function generateRandomNumber(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
+  if (min > max) throw new Error("Min is greater than max");
 
-export function generateRandomFloatNumber(min: number, max: number) {
-  return (Math.random() * (max - min) + min).toFixed(2);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
