@@ -55,18 +55,15 @@ export default function hex({
     }
 
     function createColorChannel(colorChannel: OptionChannelType) {
-      if (colorChannel) {
-        const { minValue, maxValue } = colorChannel;
-        frame[i] = createHexNumber(
-          minValue ? minValue : 0,
-          maxValue ? maxValue : 14
-        );
-      } else {
-        frame[i] = createHexNumber(
-          options?.minValue ? options.minValue : 0,
-          options?.maxValue ? options.maxValue : 14
-        );
-      }
+      const { minValue, maxValue } = colorChannel ?? {
+        minValue: undefined,
+        maxValue: undefined,
+      };
+
+      frame[i] = createHexNumber(
+        minValue ? minValue : options?.minValue ? options.minValue : 0,
+        maxValue ? maxValue : options?.maxValue ? options.maxValue : 14
+      );
     }
   }
   function createHexNumber(min: number, max: number) {

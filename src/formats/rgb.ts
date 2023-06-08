@@ -38,14 +38,11 @@ export default function rgb({
           minValue: undefined,
           maxValue: undefined,
         };
-        if (minValue != null || maxValue != null) {
-          return passValues(minValue, maxValue);
-        } else if (options?.minValue != null || options?.maxValue != null) {
-          const { minValue, maxValue } = options;
-          return passValues(minValue, maxValue);
-        } else {
-          return generateRandomNumber(0, 255).toString();
-        }
+
+        return passValues(
+          minValue ? minValue : options?.minValue ? options.minValue : 0,
+          maxValue ? maxValue : options?.maxValue ? options.maxValue : 255
+        );
       }
     }
   }
@@ -124,6 +121,6 @@ function isWrongRGB(numberToCheck: number, part: string): void {
   if (numberToCheck < 0 || numberToCheck > 255) showError();
 }
 
-function passValues(min: number | undefined, max: number | undefined) {
-  return generateRandomNumber(min ? min : 0, max ? max : 255).toString();
+function passValues(min: number, max: number) {
+  return generateRandomNumber(min, max).toString();
 }
