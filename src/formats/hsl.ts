@@ -10,21 +10,31 @@ export default function hsl({
   optionsObj: { hsl: options },
 }: RandomFormatArgs): string | null {
   // validation
-  if (typeof colorParts !== "object" && "length" in colorParts)
-    throw new Error("The colorParts is not an array");
+
+  if (typeof colorParts !== "object" || !("length" in colorParts)) {
+    console.error("The colorParts is not an array");
+    return null;
+  }
+
+  if (colorParts.length !== 3) {
+    console.error("The colorParts has not the length of three values");
+    return null;
+  }
 
   checkOptions();
 
   const frame = [0, 0, 0];
 
   for (let i = 0; i < colorParts.length; i++) {
-    if (typeof colorParts[i] !== "string")
-      throw new Error(
+    if (typeof colorParts[i] !== "string") {
+      console.error(
         `The ${i + 1} element of colorParts array is not a string `
       );
+      return null;
+    }
 
     let userValue =
-      colorParts[i].length > 0 ? Number(colorParts[i]) : colorParts[i];
+      colorParts[i]!.length > 0 ? Number(colorParts[i]) : colorParts[i];
     if (typeof userValue === "number") {
       if (Number.isNaN(userValue)) {
         return null;
@@ -117,10 +127,10 @@ export default function hsl({
       keysObject(options).forEach(key => {
         const property = options[key];
 
-        if (typeof property !== "object")
-          throw new Error(
-            `${key} property is not a part of red, green or blue`
-          );
+        if (typeof property !== "object") {
+          console.error(`${key} property is not a part of red, green or blue`);
+          return null;
+        }
 
         if (property.minValue) isWrongWritten(property.minValue, key);
         if (property.maxValue) isWrongWritten(property.maxValue, key);
@@ -134,7 +144,8 @@ function isWrongWritten(
   part: "opacity" | "hue" | "saturation" | "lightness"
 ): void {
   const showError = () => {
-    throw new Error(`The ${part} is out of accepted range`);
+    console.error(`The ${part} is out of accepted range`);
+    return null;
   };
 
   switch (part) {
@@ -149,7 +160,8 @@ function isWrongWritten(
       if (numberToCheck < 0 || numberToCheck > 1) showError();
       break;
 
-    default:
+    default: {
       throw new Error("Unknown 'part' parameter");
+    }
   }
 }

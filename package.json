@@ -1,26 +1,30 @@
 {
-  "name": "random-color-generator-api",
+  "name": "random-color-generator",
+  "license": "MIT",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "version": "1.0.0",
   "type": "module",
-  "description": "The API which allows you to generate random colors with ability to reduce or limit your output via options.",
+  "description": "The API which allows you to generate random colors with ability to limit your output via options.",
   "scripts": {
-    "tsc": "npx tsc",
-    "babel": "npx babel src/**/* --extensions .ts --out-dir dist",
-    "build": "npm run tsc && npm run babel",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "linter": "tsc",
+    "changeset": "npx changeset"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Eter-NS/Random-color-generator-API.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Norbert Sosnowski",
   "bugs": {
     "url": "https://github.com/Eter-NS/Random-color-generator-API/issues"
   },
   "homepage": "https://github.com/Eter-NS/Random-color-generator-API#readme",
   "devDependencies": {
+    "@changesets/cli": "^2.26.1",
+    "tsup": "^7.0.0",
     "typescript": "^5.0.4"
   }
 }

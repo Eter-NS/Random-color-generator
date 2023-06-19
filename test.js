@@ -1,10 +1,10 @@
-import { RandomColorGenerator } from "./dist/rcc.js";
+import { RandomColorGenerator } from "./dist/index.js";
 
 // HSL    RGB     HEX
 
 console.log(
   RandomColorGenerator({
-    format: "RGB",
+    format: "HEX",
     colorParts: ["", "", ""],
     // alphaChannel: "ff",
     optionsObj: {

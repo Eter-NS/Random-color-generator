@@ -16,12 +16,14 @@ export function RandomColorGenerator({
   optionsObj = {},
 }: RandomColorArgs): string | null {
   if (colorParts.length !== 3) {
-    throw new Error("The color array should have always three values");
+    console.error("The color array should have always three values");
+    return null;
   }
 
   for (const colorP of colorParts) {
     if (typeof colorP !== "string") {
-      throw new Error(`${colorP} is not a string type`);
+      console.error(`${colorP} is not a string type`);
+      return null;
     }
   }
 
@@ -37,7 +39,8 @@ export function RandomColorGenerator({
       return rgb({ colorParts, alphaChannel, optionsObj });
 
     default:
-      throw new Error("Unknown color format");
+      console.error("Unknown color format");
+      return null;
   }
 }
 

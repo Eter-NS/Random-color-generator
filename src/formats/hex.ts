@@ -1,3 +1,4 @@
+import { isForInStatement } from "typescript";
 import { RandomFormatArgs, OptionChannelType } from "../rccTypes.js";
 import { checkAlpha } from "../tools/checkAlpha.js";
 import keysObject from "../tools/keysObject.js";
@@ -9,10 +10,14 @@ export default function hex({
   optionsObj: { hex: options },
 }: RandomFormatArgs): string | null {
   // validation
-  if (typeof colorParts !== "object" && "length" in colorParts)
-    throw new Error("The colorParts is not an array");
-  if (colorParts.length !== 3)
-    throw new Error("The colorParts array must contain three hex values");
+  if (typeof colorParts !== "object" && "length" in colorParts) {
+    console.error("The colorParts is not an array");
+    return null;
+  }
+  if (colorParts.length !== 3) {
+    console.error("The colorParts array must contain three hex values");
+    return null;
+  }
 
   // const { hex: options } = optionsObj;
   const hexCharTable = "0123456789ABCDEF";
@@ -20,18 +25,32 @@ export default function hex({
 
   checkOptions();
 
-  let smallestLength = 0;
+  let firstUserWrittenValueLength = 0,
+    firstReached = true;
+
   for (let i = 0; i < colorParts.length; i++) {
     const color = colorParts[i];
 
-    if (typeof color !== "string")
-      throw new Error(
-        `The ${i + 1} element of colorParts array is not a string`
-      );
-    if (color.length > smallestLength) smallestLength = color.length;
+    if (checkColor(color, i)) {
+      if (color.length === 0) continue;
+
+      if (color.length > firstUserWrittenValueLength && firstReached) {
+        firstReached = false;
+        firstUserWrittenValueLength = color.length;
+      }
+
+      if (!firstReached && color.length !== firstUserWrittenValueLength) {
+        console.error(
+          `The ${
+            i + 1
+          } element of color array has not the same length as the previous written value`
+        );
+        return null;
+      }
+    }
   }
 
-  const isShorthand = smallestLength === 1;
+  const isShorthand = firstUserWrittenValueLength === 1;
 
   // const isOpacityOptionSet = options?.opacity ? true : false;
   for (let i = 0; i < frame.length; i++) {
@@ -120,9 +139,16 @@ export default function hex({
 }
 
 function isWrongWritten(optionPropertyNumber: number, key: string) {
-  console.log(optionPropertyNumber);
   if (optionPropertyNumber < 0 || optionPropertyNumber > 14) {
-    throw new Error(`The ${key} property is out of accepted range`);
+    console.error(`The ${key} property is out of accepted range`);
+    return null;
   }
   return false;
+}
+
+function checkColor(color: unknown, i: number): color is string {
+  if (typeof color !== "string") {
+    throw new Error(`The ${i + 1} element of colorParts array is not a string`);
+  }
+  return typeof color === "string";
 }

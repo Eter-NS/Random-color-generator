@@ -48,6 +48,11 @@ export default function rgb({
   }
   const [red, green, blue] = frame;
 
+  if (!red || !green || !blue) {
+    console.error("Color channel is not set");
+    return null;
+  }
+
   function formatColor(
     red: string,
     green: string,
@@ -111,7 +116,8 @@ export default function rgb({
 
 function isWrongRGB(numberToCheck: number, part: string): void {
   const showError = () => {
-    throw new Error(`The ${part} is out of accepted range`);
+    console.error(`The ${part} is out of accepted range`);
+    return null;
   };
 
   if (part === "opacity") {
